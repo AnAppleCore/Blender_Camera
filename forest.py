@@ -15,8 +15,7 @@ resolution_y = 720
 views = 5
 
 cam_location = [40.748, -18.083, 15.867]
-# cam_rotation = [90., 0., 69.4]
-cam_rotation = [0., 0., 0.]
+cam_rotation = [90., 0., 69.4]
 lens = 35
 sensor_width = 32
 target_location = [0., 0., 5.]
