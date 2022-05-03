@@ -1,1 +1,1 @@
-blender -b --python render.py -- 
+blender -b --python test.py -- 
