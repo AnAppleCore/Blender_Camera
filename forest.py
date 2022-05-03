@@ -5,12 +5,6 @@ import math
 import numpy as np
 from typing import Tuple
 
-import pip, sys
-pip.main(['install', 'pip', '--user'])
-packages_path = "C:\\Users\\BlueBird\\AppData\\Roaming\\Python\\Python39\\Scripts" + "\\..\\site-packages"
-sys.path.insert(0, packages_path)
-import tqdm
-
 # IO format
 io_folder = 'D:/Mesh/scenes/forest'
 file_format = 'JPEG'
@@ -142,6 +136,18 @@ def random_sphere(
     return location
 
 
+def mtx2str(array, digits=8):
+    s = ''
+    lines = array.tolist()
+    for line in lines:
+        for number in line:
+            if digits==8:
+                s += f"{number:.8f} "
+            elif digits==2:
+                s += f"{number:.2f} "
+        s += '\n'
+    return s
+
 # Render setting
 render.engine = "BLENDER_EEVEE"
 render.image_settings.file_format = file_format
@@ -183,22 +189,17 @@ if not os.path.isdir(cam_folder):
     os.mkdir(cam_folder)
 render.filepath = img_folder
 for r in radius:
-    for i in tqdm.trange(views, ncols=80, desc=f"views: {r:.0f}"):
+    for i in range(views):
         cam_location = random_sphere(target_location, r)
         cam_rotation = track(cam_location, target_location)
         cam.set_camera(cam_location, cam_rotation)
         extrinsic = cam.extrinsic()
-        # print(f"{'--'*20} Radius: {r} -- View: {i} {'--'*20}\n")
-        # print(f"Cam location: {cam_location}\n")
-        # print(f"Cam roration: {cam_rotation}\n")
-        # print(f"Cam intrinsic:\n {intrinsic}\n")
-        # print(f"Cam extrinsic:\n {extrinsic}\n")
 
         image_file_output.file_slots[0].path = render.filepath + f"{int(r):0>2d}-{i:0>3d}-"
-        with open(os.path.join(cam_folder, f"{int(r):02d}{i:0>3d}_cam.txt"), 'w') as f:
+        with open(os.path.join(cam_folder, f"{int(r):02d}-{i:0>3d}_cam.txt"), 'w') as f:
             f.write("extrinsic\n")
-            f.write(np.array2string(extrinsic)+'\n\n')
+            f.write(mtx2str(extrinsic)+'\n\n')
             f.write("intrinsic\n")
-            f.write(np.array2string(intrinsic, formatter={'float_kind':lambda x: "%.2f" % x})+'\n\n')
+            f.write(mtx2str(intrinsic, digits=2)+'\n\n')
 
         bpy.ops.render.render(write_still=True)
